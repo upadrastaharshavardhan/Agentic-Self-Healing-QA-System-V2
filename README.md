@@ -1,5 +1,8 @@
 # 🤖 Agentic Self-Healing QA System V2
 
+
+<img width="1983" height="793" alt="image" src="https://github.com/user-attachments/assets/c4d78b42-8204-4309-a981-47914f1377c5" />
+
 ### Autonomous Failure Investigation • Root-Cause Analysis • Risk-Aware Self-Healing • Evidence-Driven QA
 
 > **Detect → Classify → Investigate → Correlate → Reason → Decide → Safely Act → Validate → Explain → Escalate**
