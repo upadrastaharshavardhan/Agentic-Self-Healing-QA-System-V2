@@ -1,0 +1,78 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#1e3a5f', 'primaryTextColor': '#fff', 'primaryBorderColor': '#1e3a5f', 'lineColor': '#4a90a4', 'secondaryColor': '#f0f7fa', 'tertiaryColor': '#e8f4f8'}}}%%
+flowchart TB
+    subgraph External["🌐 External Systems"]
+        TR["🧪 Test Runner<br/>Playwright / pytest"]
+        APP["🖥️ Application Under Test"]
+        LOGS["📋 Log Aggregators"]
+        DEP["🚀 Deployment Systems"]
+        ENV["❤️ Environment Health"]
+    end
+
+    subgraph Core["🧠 Agentic Self-Healing QA Core"]
+        direction TB
+        FI["📥 Failure Ingestion"]
+        FR["🔀 Failure Router<br/><i>Structured Classification</i>"]
+        ORCH["🎯 Orchestrator<br/><i>Task Planner</i>"]
+        
+        subgraph Agents["⚡ Parallel Investigation Agents"]
+            direction LR
+            LA["Log Agent"]
+            UA["UI/Browser Agent"]
+            AA["API Agent"]
+            DA["Data Agent"]
+            EA["Env Agent"]
+            DepA["Deploy Agent"]
+            LocA["Locator Agent"]
+            HA["History Agent"]
+        end
+
+        AGG["📦 Evidence Aggregator"]
+        RCA["🔍 RCA Agent<br/><i>Root Cause Reasoner</i>"]
+        ACT["⚖️ Action Selector"]
+        REC["🛠️ Safe Recovery Executor"]
+        EVAL["✅ Evaluator"]
+        MEM[("📚 Historical Memory<br/>PostgreSQL + Vector")]
+        STATE[("💾 Persistent State")]
+        OBS["📡 Observability<br/>OpenTelemetry"]
+        HITL["👤 Human Approval Gateway"]
+    end
+
+    subgraph Output["📤 Outputs"]
+        DIAG["📄 Final Diagnosis"]
+        AUDIT["📜 Full Audit Trail"]
+        DASH["📊 Investigation Dashboard"]
+    end
+
+    TR -->|"Failure Event"| FI
+    FI --> FR
+    FR --> ORCH
+    ORCH --> Agents
+    Agents --> AGG
+    AGG --> RCA
+    RCA <--> MEM
+    RCA --> ACT
+    ACT -->|"Low Risk"| REC
+    ACT -->|"High Risk / Low Conf"| HITL
+    HITL -->|"Approved"| REC
+    HITL -->|"Rejected"| DIAG
+    REC --> EVAL
+    EVAL -->|"Success"| DIAG
+    EVAL -->|"Retry possible"| ORCH
+    EVAL -->|"Limits reached"| HITL
+    EVAL --> MEM
+    DIAG --> DASH
+    AUDIT --> DASH
+    STATE -.-> Core
+    OBS -.-> Core
+
+    classDef external fill:#e8f4f8,stroke:#4a90a4,stroke-width:2px
+    classDef core fill:#1e3a5f,stroke:#1e3a5f,color:#fff
+    classDef agent fill:#2c5282,stroke:#2c5282,color:#fff
+    classDef output fill:#38a169,stroke:#276749,color:#fff
+    classDef storage fill:#805ad5,stroke:#553c9a,color:#fff
+
+    class TR,APP,LOGS,DEP,ENV external
+    class FI,FR,ORCH,AGG,RCA,ACT,REC,EVAL,HITL core
+    class LA,UA,AA,DA,EA,DepA,LocA,HA agent
+    class DIAG,AUDIT,DASH output
+    class MEM,STATE storage

@@ -1,0 +1,45 @@
+%%{init: {'theme': 'base'}}%%
+flowchart TD
+    Start([Test Failure Event]) --> Extract[Extract:<br/>• Failure Message<br/>• Stack Trace<br/>• Test Metadata<br/>• Screenshot / DOM if available]
+
+    Extract --> Classify[LLM + Structured Output<br/>Classification]
+
+    Classify --> Decision{Determined Type?}
+
+    Decision -->|UI related| UI[UI_FAILURE]
+    Decision -->|Locator| LOC[LOCATOR_FAILURE]
+    Decision -->|Timeout / Sync| TO[TIMEOUT_FAILURE]
+    Decision -->|HTTP / Contract| API[API_FAILURE]
+    Decision -->|Data integrity| DATA[DATA_FAILURE]
+    Decision -->|Service health| ENV[ENVIRONMENT_FAILURE]
+    Decision -->|Auth / Session| AUTH[AUTH_FAILURE]
+    Decision -->|Recent deploy correlation| DEP[DEPLOYMENT_FAILURE]
+    Decision -->|Infra| INFRA[INFRASTRUCTURE_FAILURE]
+    Decision -->|Assertion| ASSERT[ASSERTION_FAILURE]
+    Decision -->|Intermittent pattern| FLAKY[FLAKY_FAILURE]
+    Decision -->|Cannot determine| UNK[UNKNOWN_FAILURE]
+
+    UI --> Conf{Confidence ≥ Threshold?}
+    LOC --> Conf
+    TO --> Conf
+    API --> Conf
+    DATA --> Conf
+    ENV --> Conf
+    AUTH --> Conf
+    DEP --> Conf
+    INFRA --> Conf
+    ASSERT --> Conf
+    FLAKY --> Conf
+    UNK --> Escalate[Force Human Escalation]
+
+    Conf -->|Yes| Route[Route to Orchestrator<br/>with Type + Confidence]
+    Conf -->|No| Escalate
+
+    Route --> Continue([Continue Investigation])
+    Escalate --> Human([Human Review Required])
+
+    style UNK fill:#fed7d7,stroke:#c53030
+    style Escalate fill:#fed7d7,stroke:#c53030
+    style Human fill:#feb2b2,stroke:#c53030
+    style Route fill:#c6f6d5,stroke:#276749
+    style Continue fill:#c6f6d5,stroke:#276749

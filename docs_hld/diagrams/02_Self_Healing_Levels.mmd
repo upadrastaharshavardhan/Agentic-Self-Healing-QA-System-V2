@@ -1,0 +1,53 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#2b6cb0'}}}%%
+stateDiagram-v2
+    [*] --> L0: New Failure
+
+    state "Level 0\nDiagnosis Only" as L0
+    state "Level 1\nSafe Retry" as L1
+    state "Level 2\nNon-destructive Recovery" as L2
+    state "Level 3\nPropose Modification" as L3
+    state "Level 4\nHuman-Approved Change" as L4
+    state "Level 5\nRestricted Autonomous" as L5
+    state "Human Approval Required" as HITL
+    state "Escalated to Human" as ESC
+    state "Successfully Resolved" as OK
+
+    L0 --> L1: Policy allows retry
+    L1 --> L2: Non-destructive action permitted
+    L2 --> L3: Modification needed
+    L3 --> HITL: Always
+    L4 --> HITL: Always
+    L5 --> HITL: Pre-approved scenarios only
+
+    L0 --> ESC: Low confidence
+    L1 --> ESC: Max retries reached
+    L2 --> ESC: Validation failed
+    HITL --> L3: Approved (propose)
+    HITL --> L4: Approved (apply)
+    HITL --> ESC: Rejected
+
+    L1 --> OK: Retry validated
+    L2 --> OK: Recovery validated
+    L5 --> OK: Change validated
+
+    OK --> [*]
+    ESC --> [*]
+
+    note right of L0
+        No side effects.
+        Pure investigation + RCA.
+    end note
+
+    note right of L2
+        Session refresh,
+        test data re-fetch,
+        cache clear.
+        Still fully reversible.
+    end note
+
+    note right of L5
+        Only for explicitly
+        approved low-risk
+        scenarios defined
+        in policy.
+    end note

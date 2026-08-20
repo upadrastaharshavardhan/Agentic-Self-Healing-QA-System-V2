@@ -1,0 +1,62 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'actorBkg': '#1e3a5f', 'actorTextColor': '#ffffff', 'actorLineColor': '#4a90a4', 'signalColor': '#2b6cb0', 'noteBkgColor': '#ebf8ff'}}}%%
+sequenceDiagram
+    autonumber
+    participant TR as Test Runner
+    participant FI as Failure Ingestion
+    participant FR as Failure Router
+    participant OR as Orchestrator
+    participant Agents as Specialized Agents<br/>(Parallel)
+    participant AGG as Evidence Aggregator
+    participant RCA as RCA Agent
+    participant MEM as Historical Memory
+    participant ACT as Action Selector
+    participant REC as Safe Recovery
+    participant EVAL as Evaluator
+    participant HITL as Human Approval
+    participant OUT as Final Diagnosis
+
+    TR->>FI: Test Failure Event
+    FI->>FR: Normalized Failure Event
+    FR->>FR: Structured Classification<br/>+ Confidence Score
+    FR->>OR: Failure Type + Confidence
+
+    OR->>OR: Plan Investigation Tasks
+
+    par Parallel Evidence Collection
+        OR->>Agents: Log Analysis Agent
+        OR->>Agents: UI / Browser Agent
+        OR->>Agents: API Agent
+        OR->>Agents: Test Data Agent
+        OR->>Agents: Environment Agent
+        OR->>Agents: Deployment Agent
+        OR->>Agents: Locator Agent
+        OR->>Agents: Historical Agent
+    end
+
+    Agents->>AGG: Evidence Packets
+    AGG->>RCA: Aggregated Evidence
+    RCA->>MEM: Query similar historical failures
+    MEM-->>RCA: Past RCA + Resolutions
+    RCA->>RCA: Reason with strict layers<br/>Fact → Observation → Inference → Hypothesis → Recommendation
+    RCA->>ACT: RCA Result + Confidence + Recommendation
+
+    alt High Confidence + Low Risk
+        ACT->>REC: Execute Safe Recovery Action
+        REC->>EVAL: Action Result
+        EVAL->>EVAL: Validate outcome
+        alt Recovery Successful
+            EVAL->>OUT: RESOLVED + Full Diagnosis
+        else Recovery Failed / Uncertain
+            EVAL->>OR: Increment counters (if limits allow)
+        end
+    else Low Confidence or High Risk
+        ACT->>HITL: Request Human Approval
+        HITL-->>ACT: Approve / Reject / Request more evidence
+        alt Approved
+            ACT->>REC: Execute Action
+        else Rejected
+            ACT->>OUT: ESCALATED with full evidence trail
+        end
+    end
+
+    OUT->>MEM: Store outcome for future learning

@@ -1,0 +1,28 @@
+%%{init: {'theme': 'forest'}}%%
+flowchart TD
+    E[Aggregated Multi-Source Evidence] --> F
+
+    subgraph Reasoning["RCA Agent Reasoning Layers (Strict Separation)"]
+        F["🟢 FACTS<br/>Directly observed data<br/>from tools<br/><i>No interpretation</i>"]
+        O["🔵 OBSERVATIONS<br/>Derived measurements<br/>and tool conclusions"]
+        I["🟡 INFERENCES<br/>Logical conclusions<br/>drawn from Facts + Observations"]
+        H["🔴 HYPOTHESES<br/>Ranked possible root causes<br/>with supporting & contradicting evidence"]
+        R["⚪ RECOMMENDATION<br/>Best next action<br/>+ Risk Level + Rationale"]
+    end
+
+    F --> O
+    O --> I
+    F --> I
+    I --> H
+    H --> R
+
+    R --> Decision{Confidence & Risk?}
+    Decision -->|High Conf + Low Risk| Auto[Execute Safe Recovery]
+    Decision -->|Medium/Low or High Risk| Human[Human Approval Required]
+    Decision -->|Conflicting Evidence| Escal[Force Escalation]
+
+    style F fill:#c6f6d5,stroke:#276749
+    style O fill:#bee3f8,stroke:#2b6cb0
+    style I fill:#fefcbf,stroke:#975a16
+    style H fill:#fed7d7,stroke:#c53030
+    style R fill:#e2e8f0,stroke:#4a5568

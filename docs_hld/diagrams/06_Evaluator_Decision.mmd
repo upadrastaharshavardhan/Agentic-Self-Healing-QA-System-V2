@@ -1,0 +1,31 @@
+%%{init: {'theme': 'base'}}%%
+flowchart TD
+    Start([Recovery Action Completed]) --> Pass{Did the original<br/>test now pass?}
+
+    Pass -->|No| Failed[FAILED_RECOVERY]
+    Pass -->|Yes| Side{Were new failures<br/>introduced?}
+
+    Side -->|Yes| Failed
+    Side -->|No| Consistent{Is evidence still<br/>consistent with RCA?}
+
+    Consistent -->|No| Uncertain[UNCERTAIN]
+    Consistent -->|Yes| Conf{Is confidence<br/>still high enough?}
+
+    Conf -->|No| Uncertain
+    Conf -->|Yes| Success[SUCCESS]
+
+    Failed --> Limits{Investigation / Retry<br/>limits reached?}
+    Uncertain --> Limits
+
+    Limits -->|No| Replan[Return to Orchestrator<br/>for additional investigation]
+    Limits -->|Yes| Escalate[ESCALATE TO HUMAN]
+
+    Success --> Report1[Final Diagnosis:<br/>RESOLVED]
+    Escalate --> Report2[Final Diagnosis:<br/>ESCALATED + Full Evidence]
+
+    style Success fill:#c6f6d5,stroke:#276749
+    style Report1 fill:#c6f6d5,stroke:#276749
+    style Failed fill:#fed7d7,stroke:#c53030
+    style Uncertain fill:#fefcbf,stroke:#975a16
+    style Escalate fill:#feb2b2,stroke:#c53030
+    style Report2 fill:#feb2b2,stroke:#c53030
